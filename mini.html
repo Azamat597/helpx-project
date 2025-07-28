@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpx</title>
+    <style>
+        #miniWindow {
+            display: none;
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 300px;
+            height: 150px;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let isActive = false;
+
+        // Открытие мини-окна по Ctrl + Alt
+        document.addEventListener("keydown", function(event) {
+            if (event.ctrlKey && event.altKey) {
+                let miniWindow = document.getElementById("miniWindow");
+                miniWindow.style.display = miniWindow.style.display === "none" ? "block" : "none";
+            }
+        });
+
+        // Деактивация кода по F5
+        window.addEventListener("beforeunload", function() {
+            fetch("/deactivate", { method: "POST", body: JSON.stringify({ user_id: "123" }) });
+        });
+
+        async function askGPT() {
+            let question = document.getElementById("question").value;
+            let response = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: "123", question: question })
+            });
+            let data = await response.json();
+            document.getElementById("answer").innerText = data.answer;
+        }
+    </script>
+
+    <div id="miniWindow">
+        <input type="text" id="question" placeholder="Введите вопрос">
+        <button onclick="askGPT()">Спросить</button>
+        <p id="answer"></p>
+    </div>
+</body>
+<script src="./helpx.js"></script>
+
+</html>
